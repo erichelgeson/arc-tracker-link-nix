@@ -19,7 +19,17 @@
         inherit pname version src;
         # The AppImage expects these from the host system instead of bundling them.
         extraPkgs = p: with p; [ webkitgtk_4_1 libsoup_3 gtk3 glib-networking libayatana-appindicator dbus ];
+        # Link writes its own URL handler to ~/.local/share/applications on start. It uses
+        # $APPIMAGE as the Exec path when set, so point that at this wrapper instead of
+        # the bare binary inside it, which can't find WebKitGTK on its own.
         extraInstallCommands = ''
+          mv $out/bin/${pname} $out/bin/.${pname}-fhs
+          cat > $out/bin/${pname} <<EOF
+          #!${pkgs.runtimeShell}
+          export APPIMAGE=$out/bin/${pname}
+          exec $out/bin/.${pname}-fhs "\$@"
+          EOF
+          chmod +x $out/bin/${pname}
           install -Dm444 ${contents}/arctracker-link.desktop $out/share/applications/arctracker-link.desktop
           substituteInPlace $out/share/applications/arctracker-link.desktop \
             --replace-fail 'Exec=arctracker-link' 'Exec=${pname}'
