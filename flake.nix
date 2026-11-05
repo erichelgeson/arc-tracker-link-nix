@@ -13,7 +13,7 @@
         url = "https://cdn.arctracker.io/link/linux/ARC-Tracker-Link-${version}-x86_64.AppImage";
         hash = "sha256-ERdbVsmIUwK6wA0LQDba0ZKYk6bvr4vXYJLEqYvokUg=";
       };
-      contents = pkgs.appimageTools.extractType2 { inherit pname version src; };
+      contents = pkgs.appimageTools.extract { inherit pname version src; };
     in {
       packages.${system}.default = pkgs.appimageTools.wrapType2 {
         inherit pname version src;
